@@ -1,0 +1,241 @@
+<section class="min-h-screen flex flex-col lg:flex-row">
+  <!-- Left Side -->
+  <div class="w-full lg:w-1/2 flex items-center justify-center bg-neutral-secondary-medium p-8">
+    <div class="max-w-md text-center lg:text-left">
+      <h1 class="text-4xl lg:text-5xl font-bold text-blue-600 mb-6">Routebook</h1>
+      <p class="text-body text-lg leading-relaxed">
+        Create your account now and start using Routebook to connect, explore, and manage your
+        experience in a smarter way. Everything you need is just one step away.
+      </p>
+    </div>
+  </div>
+
+  <!-- Right Side -->
+  <div class="w-full lg:w-1/2 flex items-center justify-center p-8">
+    <form [formGroup]="registerform" class="max-w-sm w-full" (ngSubmit)="subminRegister()">
+      <!-- Name -->
+      <div class="mb-5">
+        <label for="name" class="block mb-2.5 text-sm font-medium text-heading"> Your Name </label>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow placeholder:text-body"
+          placeholder="Enter Name"
+        />
+      </div>
+      @if (registerform.get('name')?.touched && registerform.get('name')?.invalid) {
+        <div class="p-4 mb-4 text-sm text-fg-danger-strong rounded-base bg-danger-soft">
+          <span class="font-medium">Name Error:</span>
+
+          @if (registerform.get('name')?.getError('required')) {
+            <span> Name is required. </span>
+          }
+
+          @if (registerform.get('name')?.getError('minlength')) {
+            <span>
+              Name must be at least
+              {{ registerform.get('name')?.getError('minlength').requiredLength }} characters. You
+              entered {{ registerform.get('name')?.getError('minlength').actualLength }}.
+            </span>
+          }
+        </div>
+      }
+
+      <!-- Username -->
+      <div class="mb-5">
+        <label for="username" class="block mb-2.5 text-sm font-medium text-heading">
+          Your Username
+        </label>
+        <input
+          id="username"
+          type="text"
+          formControlName="username"
+          class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow placeholder:text-body"
+          placeholder="Enter Username"
+        />
+      </div>
+      @if (registerform.get('username')?.touched && registerform.get('username')?.invalid) {
+        <div class="p-4 mb-4 text-sm text-fg-danger-strong rounded-base bg-danger-soft">
+          <span class="font-medium">Username Error:</span>
+          @if (registerform.get('username')?.getError('required')) {
+            <span> Username is required. </span>
+          }
+        </div>
+      }
+
+      <!-- Email -->
+      <div class="mb-5">
+        <label for="email" class="block mb-2.5 text-sm font-medium text-heading">
+          Your Email
+        </label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow placeholder:text-body"
+          placeholder="name@example.com"
+        />
+      </div>
+      @if (registerform.get('email')?.touched && registerform.get('email')?.invalid) {
+        <div class="p-4 mb-4 text-sm text-fg-danger-strong rounded-base bg-danger-soft">
+          <span class="font-medium">Email Error:</span>
+
+          @if (registerform.get('email')?.getError('required')) {
+            <span> Email is required. </span>
+          }
+
+          @if (registerform.get('email')?.getError('email')) {
+            <span> Please enter a valid email address. </span>
+          }
+        </div>
+      }
+
+      <!-- Password -->
+      <div class="mb-5">
+        <label for="password" class="block mb-2.5 text-sm font-medium text-heading">
+          Your Password
+        </label>
+        <div class="relative">
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow placeholder:text-body pr-10"
+            placeholder="••••••••"
+          />
+          <button type="button" (click)="showPassword = !showPassword"
+            class="absolute inset-y-0 right-3 flex items-center text-body">
+            <fa-icon [icon]="showPassword ? faEyeSlash : faEye" />
+          </button>
+        </div>
+      </div>
+      @if (registerform.get('password')?.touched && registerform.get('password')?.invalid) {
+        <div class="p-4 mb-4 text-sm text-fg-danger-strong rounded-base bg-danger-soft">
+          <span class="font-medium">Password Error:</span>
+
+          @if (registerform.get('password')?.getError('required')) {
+            <span> Password is required. </span>
+          }
+
+          @if (registerform.get('password')?.getError('pattern')) {
+            <span>
+              Password must include: • 1 uppercase • 1 lowercase • 1 number • 1 special character •
+              min 8 characters
+            </span>
+          }
+        </div>
+      }
+
+      <!-- Confirm Password -->
+      <div class="mb-5">
+        <label for="rePassword" class="block mb-2.5 text-sm font-medium text-heading">
+          Confirm Your Password
+        </label>
+        <div class="relative">
+          <input
+            id="rePassword"
+            [type]="showRePassword ? 'text' : 'password'"
+            formControlName="rePassword"
+            class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow placeholder:text-body pr-10"
+            placeholder="••••••••"
+          />
+          <button type="button" (click)="showRePassword = !showRePassword"
+            class="absolute inset-y-0 right-3 flex items-center text-body">
+            <fa-icon [icon]="showRePassword ? faEyeSlash : faEye" />
+          </button>
+        </div>
+      </div>
+      @if (registerform.get('rePassword')?.touched && registerform.get('rePassword')?.invalid) {
+        <div class="p-4 mb-4 text-sm text-fg-danger-strong rounded-base bg-danger-soft">
+          <span class="font-medium">Confirm Password Error:</span>
+
+          @if (registerform.get('rePassword')?.getError('required')) {
+            <span> Please confirm your password. </span>
+          }
+
+          @if (registerform.get('rePassword')?.getError('mismatch')) {
+            <span> Passwords do not match. </span>
+          }
+        </div>
+      }
+
+      <!-- Date of Birth -->
+      <div class="mb-5">
+        <label for="dateOfBirth" class="block mb-2.5 text-sm font-medium text-heading">
+          Date of Birth
+        </label>
+        <input
+          id="dateOfBirth"
+          type="date"
+          formControlName="dateOfBirth"
+          class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow"
+        />
+      </div>
+      @if (registerform.get('dateOfBirth')?.touched && registerform.get('dateOfBirth')?.invalid) {
+        <div class="p-4 mb-4 text-sm text-fg-danger-strong rounded-base bg-danger-soft">
+          <span class="font-medium">Date Error:</span>
+          Date of birth is required.
+        </div>
+      }
+
+      <!-- Gender -->
+      <div class="mb-5">
+        <label for="gender" class="block mb-2.5 text-sm font-medium text-heading">
+          Select an Option
+        </label>
+        <select
+          id="gender"
+          formControlName="gender"
+          class="block w-full px-3 py-2.5 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs"
+        >
+          <option value="" disabled selected hidden>Choose gender</option>
+          <option value="male">male</option>
+          <option value="female">female</option>
+        </select>
+      </div>
+      @if (registerform.get('gender')?.touched && registerform.get('gender')?.invalid) {
+        <div class="p-4 mb-4 text-sm text-fg-danger-strong rounded-base bg-danger-soft">
+          <span class="font-medium">Gender Error:</span>
+          Please select your gender.
+        </div>
+      }
+
+      <div class="mb-5">
+        <div class="flex pt-3 items-start mb-5">
+          <input
+            type="checkbox"
+            class="w-4 h-4 border border-default-medium rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft"
+            required
+          />
+          <p class="ms-2 text-sm font-medium text-heading w-100 select-none">
+            I agree with the
+            <a href="#" class="text-fg-brand hover:underline"> terms and conditions </a>.
+          </p>
+          <a routerLink="/login" class="underline text-blue-600 cursor-pointer"> login </a>
+        </div>
+        @if (successMessage) {
+          <div class="p-4 mb-4 text-sm text-green-800 rounded-base bg-green-100">
+            <span class="font-medium">Success: </span>{{ successMessage }}
+          </div>
+        }
+        @if (errorMessage) {
+          <div class="p-4 mb-4 text-sm text-fg-danger-strong rounded-base bg-danger-soft">
+            <span class="font-medium">Error: </span>{{ errorMessage }}
+          </div>
+        }
+        <button
+          type="submit"
+          [disabled]="registerform.invalid || isLoading"
+          [class.cursor-not-allowed]="registerform.invalid || isLoading"
+          class="w-full mt-3 text-white bg-brand border border-transparent hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium shadow-xs font-medium rounded-base text-sm px-4 py-2.5 focus:outline-none"
+        >
+          @if (isLoading) {
+            <fa-icon [icon]="faSpinner" class="animate-spin me-2" />
+          }
+          Submit
+        </button>
+      </div>
+    </form>
+  </div>
+</section>

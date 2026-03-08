@@ -1,0 +1,96 @@
+<section class="min-h-screen flex flex-col lg:flex-row">
+  <!-- Left Side -->
+  <div class="w-full lg:w-1/2 flex items-center justify-center bg-neutral-secondary-medium p-8">
+    <div class="max-w-md text-center lg:text-left">
+      <h1 class="text-4xl lg:text-5xl font-bold text-blue-600 mb-6">Routebook</h1>
+      <p class="text-body text-lg leading-relaxed">
+        Welcome back. Log in to your account and continue your journey with Routebook.
+      </p>
+    </div>
+  </div>
+
+  <!-- Right Side -->
+  <div class="w-full lg:w-1/2 flex items-center justify-center p-8">
+    <form [formGroup]="loginForm" class="max-w-sm w-full" (ngSubmit)="submitLogin()">
+
+      <!-- Email -->
+      <div class="mb-5">
+        <label for="email" class="block mb-2.5 text-sm font-medium text-heading">
+          Your Email
+        </label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow"
+          placeholder="name@example.com"
+        />
+      </div>
+      @if (loginForm.get('email')?.touched && loginForm.get('email')?.invalid) {
+        <div class="p-4 mb-4 text-sm text-fg-danger-strong rounded-base bg-danger-soft">
+          <span class="font-medium">Email Error:</span>
+          @if (loginForm.get('email')?.getError('required')) {
+            <span> Email is required.</span>
+          }
+          @if (loginForm.get('email')?.getError('email')) {
+            <span> Please enter a valid email.</span>
+          }
+        </div>
+      }
+
+      <!-- Password -->
+      <div class="mb-5">
+        <label for="password" class="block mb-2.5 text-sm font-medium text-heading">
+          Your Password
+        </label>
+        <div class="relative">
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow pr-10"
+            placeholder="••••••••"
+          />
+          <button type="button" (click)="showPassword = !showPassword"
+            class="absolute inset-y-0 right-3 flex items-center text-body">
+            <fa-icon [icon]="showPassword ? faEyeSlash : faEye" />
+          </button>
+        </div>
+      </div>
+      @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
+        <div class="p-4 mb-4 text-sm text-fg-danger-strong rounded-base bg-danger-soft">
+          <span class="font-medium">Password Error:</span>
+          @if (loginForm.get('password')?.getError('required')) {
+            <span> Password is required.</span>
+          }
+        </div>
+      }
+
+      <!-- Error Alert -->
+      @if (errorMessage) {
+        <div class="p-4 mb-4 text-sm text-fg-danger-strong rounded-base bg-danger-soft">
+          <span class="font-medium">Error: </span>{{ errorMessage }}
+        </div>
+      }
+
+      <!-- Submit -->
+      <button
+        type="submit"
+        [disabled]="loginForm.invalid || isLoading"
+        [class.cursor-not-allowed]="loginForm.invalid || isLoading"
+        class="w-full text-white bg-brand border border-transparent hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium shadow-xs font-medium rounded-base text-sm px-4 py-2.5"
+      >
+        @if (isLoading) {
+          <fa-icon [icon]="faSpinner" class="animate-spin me-2" />
+        }
+        Login
+      </button>
+
+      <p class="text-sm text-center mt-4">
+        Don't have an account?
+        <a routerLink="/signup" class="text-blue-600 underline">Register</a>
+      </p>
+
+    </form>
+  </div>
+</section>

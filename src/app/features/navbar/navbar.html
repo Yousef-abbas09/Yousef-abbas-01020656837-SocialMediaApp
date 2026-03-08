@@ -1,0 +1,60 @@
+<nav class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between shadow-sm">
+
+  <!-- Left: Logo -->
+  <div routerLink="/feed" class="cursor-pointer flex items-center gap-3">
+    <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center">
+      <img class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center" src="/route-logo.png" alt="...">
+    </div>
+    <span class="font-bold text-gray-800 text-lg">Routebook</span>
+  </div>
+
+  <!-- Center: Nav Links -->
+  <div class="flex items-center gap-1">
+    <a routerLink="/feed" routerLinkActive="text-blue-600 bg-blue-50" 
+       class="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-all text-sm font-medium">
+      <fa-icon [icon]="faHouse" />
+      Feed
+    </a>
+    <a routerLink="/notifications" routerLinkActive="text-blue-600 bg-blue-50"
+       class="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-all text-sm font-medium">
+      <fa-icon [icon]="faBell" />
+      Notifications
+    </a>
+  </div>
+
+  <!-- Right: User -->
+  <div class="flex items-center gap-3 relative">
+    <button (click)="toggleDropdown()" class="flex items-center gap-2 cursor-pointer focus:outline-none">
+      <img
+        [src]="userPhoto"
+        alt="user photo"
+        class="w-9 h-9 rounded-full object-cover border-2 border-blue-100"
+      />
+      <span class="text-sm font-medium text-gray-700">{{ userName }}</span>
+      <fa-icon [icon]="faBars" class="text-gray-400 text-sm" />
+    </button>
+
+    <!-- Dropdown -->
+    @if (isDropdownOpen) {
+      <div class="absolute right-0 top-12 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
+        <a routerLink="/profile" (click)="isDropdownOpen = false"
+           class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+          <fa-icon [icon]="faUser" class="text-blue-500 w-4" />
+          Profile
+        </a>
+        <a routerLink="/changepassword" (click)="isDropdownOpen = false"
+           class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+          <fa-icon [icon]="faGear" class="text-gray-400 w-4" />
+          Settings
+        </a>
+        <hr class="my-1 border-gray-100" />
+        <button (click)="logout()"
+           class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors">
+          <fa-icon [icon]="faRightFromBracket" class="w-4" />
+          Log Out
+        </button>
+      </div>
+    }
+  </div>
+
+</nav>
