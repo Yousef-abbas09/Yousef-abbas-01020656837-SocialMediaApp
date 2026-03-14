@@ -10,6 +10,7 @@ import { NotFound } from './features/not-found/not-found';
 import { PostDetails } from './features/post-details/post-details';
 import { Profile } from './features/profile/profile';
 import { Notifications } from './features/notifications/notifications';
+import { UserProfile } from './features/user-profile/user-profile';
 
 
 export const routes: Routes = [
@@ -23,6 +24,7 @@ export const routes: Routes = [
       { path: 'notifications', component: Notifications, title: 'notifications page' },
       { path: 'changepassword', component: ChangePassword, title: 'change password' },
       { path: 'post-details/:id', component: PostDetails, title: 'post details page' },
+      { path: 'user-profile/:id', component: UserProfile, title: 'user profile page' },
       { path: '', redirectTo: 'feed', pathMatch: 'full' },
     ],
   },

@@ -334,7 +334,9 @@
                 class="w-10 h-10 rounded-full object-cover border border-gray-200"
               />
               <div>
-                <p class="font-semibold text-gray-800 text-sm">{{ post.user.name }}</p>
+                <a [routerLink]="['/user-profile', post.user._id]"
+                  ><p class="font-semibold text-gray-800 text-sm">{{ post.user.name }}</p></a
+                >
                 <div class="flex items-center gap-1 text-xs text-gray-400">
                   @if (post.user.username) {
                     <span>@{{ post.user.username }}</span>
@@ -992,7 +994,9 @@
                   class="w-9 h-9 rounded-full object-cover border border-gray-100 flex-shrink-0"
                 />
                 <div class="overflow-hidden">
-                  <p class="text-[11px] font-bold text-gray-800 truncate">{{ user.name }}</p>
+                  <a [routerLink]="['/user-profile', user._id]"
+                    ><p class="text-[11px] font-bold text-gray-800 truncate">{{ user.name }}</p></a
+                  >
                   <p class="text-[9px] text-gray-400 truncate">
                     {{ user.followersCount }} followers
                     @if (user.mutualFollowersCount > 0) {

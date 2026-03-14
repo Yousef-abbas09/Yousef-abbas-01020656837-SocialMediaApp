@@ -1,0 +1,78 @@
+.nf-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  padding: 2rem;
+  text-align: center;
+}
+
+.nf-svg {
+  margin-bottom: 1rem;
+}
+
+.nf-code {
+  font-size: 120px;
+  font-weight: 700;
+  line-height: 1;
+  color: #1e293b;
+  letter-spacing: -4px;
+  margin-bottom: 0.25rem;
+}
+
+.nf-code span {
+  color: #378ADD;
+}
+
+.nf-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0.5rem 0 0;
+}
+
+.nf-sub {
+  font-size: 15px;
+  color: #64748b;
+  margin: 0.5rem 0 1.75rem;
+  max-width: 340px;
+  line-height: 1.6;
+}
+
+.nf-dots {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 2rem;
+}
+
+.nf-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #cbd5e1;
+}
+
+.nf-dot.active {
+  background: #378ADD;
+}
+
+.nf-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 12px;
+  background: #378ADD;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.nf-btn:hover {
+  opacity: 0.85;
+}
