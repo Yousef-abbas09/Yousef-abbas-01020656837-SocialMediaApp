@@ -1,0 +1,5 @@
+@reference "../../../styles.css"; /* المسار ده لازم يوصل لملف الـ CSS الرئيسي اللي فيه @import "tailwindcss" */
+
+.notification-card {
+  @apply border border-transparent hover:border-blue-100 hover:shadow-sm transition-all duration-200;
+}

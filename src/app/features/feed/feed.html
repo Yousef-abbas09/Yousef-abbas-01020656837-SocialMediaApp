@@ -1,1 +1,1017 @@
-<p>feed works!</p>
+<!-- Share Modal -->
+@if (showShareModal) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-white/10"
+    (click)="closeShareModal()"
+  >
+    <div
+      class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 overflow-hidden"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">Share Post</h3>
+        <button
+          (click)="closeShareModal()"
+          class="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100"
+        >
+          <fa-icon [icon]="faXmark" />
+        </button>
+      </div>
+
+      <div class="p-4">
+        <div class="flex items-center gap-3 mb-3">
+          <img
+            [src]="currentUser.photo"
+            alt="user photo"
+            class="w-9 h-9 rounded-full object-cover border border-gray-200"
+          />
+          <p class="font-semibold text-gray-800 text-sm">{{ currentUser.name }}</p>
+        </div>
+
+        <textarea
+          [(ngModel)]="shareBody"
+          placeholder="Say something about this..."
+          class="w-full min-h-20 border border-gray-200 rounded-lg outline-none resize-none text-gray-700 text-sm p-3 leading-relaxed placeholder-gray-400 focus:border-blue-400 transition-colors"
+        ></textarea>
+
+        <div class="border border-gray-200 rounded-xl overflow-hidden bg-gray-50 mt-2">
+          <div class="flex items-center gap-2 px-3 pt-3 pb-2">
+            <img
+              [src]="selectedSharePost?.user?.photo"
+              class="w-7 h-7 rounded-full object-cover border border-gray-200"
+            />
+            <div>
+              <p class="font-semibold text-gray-800 text-xs">{{ selectedSharePost?.user?.name }}</p>
+              <p class="text-xs text-gray-400">
+                {{ selectedSharePost?.createdAt | date: 'mediumDate' }}
+              </p>
+            </div>
+          </div>
+          @if (selectedSharePost?.body?.trim()) {
+            <p class="px-3 pb-2 text-gray-600 text-xs">{{ selectedSharePost?.body }}</p>
+          }
+          @if (selectedSharePost?.image) {
+            <img [src]="selectedSharePost?.image" class="w-full object-cover max-h-40" />
+          }
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 px-4 py-3 border-t border-gray-100">
+        <button
+          (click)="closeShareModal()"
+          class="px-4 py-2 text-sm text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          (click)="confirmShare()"
+          class="px-4 py-2 text-sm bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors"
+        >
+          <fa-icon [icon]="faShare" class="mr-1" />
+          Share
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Image Modal -->
+@if (showImageModal) {
+  <div
+    class="fixed inset-0 z-[60] flex items-center justify-center backdrop-blur-md bg-black/70 p-4 transition-all"
+    (click)="closeImagePreview()"
+  >
+    <button
+      (click)="closeImagePreview()"
+      class="absolute top-5 right-5 text-white/70 hover:text-white transition-colors p-2"
+    >
+      <fa-icon [icon]="faXmark" size="2xl" />
+    </button>
+    <div
+      class="relative max-w-5xl w-full flex justify-center items-center"
+      (click)="$event.stopPropagation()"
+    >
+      <img
+        [src]="selectedPreviewImage"
+        class="max-w-full max-h-[90vh] rounded-lg shadow-2xl object-contain animate-zoom-in"
+        alt="Preview"
+      />
+    </div>
+  </div>
+}
+
+<!-- Toast -->
+@if (showToast) {
+  <div
+    class="fixed top-5 right-5 z-50 flex items-center gap-3 bg-white px-4 py-3 rounded-xl shadow-lg animate-fade-in"
+    [class]="toastType === 'success' ? 'border border-green-100' : 'border border-red-100'"
+  >
+    <div
+      class="w-8 h-8 rounded-full flex items-center justify-center"
+      [class]="toastType === 'success' ? 'bg-green-100' : 'bg-red-100'"
+    >
+      <fa-icon
+        [icon]="toastType === 'success' ? faCircleCheck : faXmark"
+        [class]="toastType === 'success' ? 'text-green-500' : 'text-red-500'"
+      />
+    </div>
+    <p
+      class="text-sm font-medium"
+      [class]="toastType === 'success' ? 'text-green-700' : 'text-red-700'"
+    >
+      {{ toastMessage }}
+    </p>
+  </div>
+}
+
+<!-- الـ Modal - حطه مع باقي الـ modals فوق -->
+@if (showDeleteModal) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30"
+    (click)="closeDeleteModal()"
+  >
+    <div
+      class="bg-white rounded-2xl shadow-xl w-full max-w-sm mx-4 overflow-hidden"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="p-6 text-center">
+        <div
+          class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4"
+        >
+          <fa-icon [icon]="faTrash" class="text-red-500 text-lg" />
+        </div>
+        <h3 class="font-bold text-gray-800 text-lg mb-1">
+          {{ deleteTargetType === 'post' ? 'Delete Post' : 'Delete Comment' }}
+        </h3>
+        <p class="text-gray-400 text-sm">
+          Are you sure you want to delete this {{ deleteTargetType }}? This action cannot be undone.
+        </p>
+      </div>
+      <div class="flex border-t border-gray-100">
+        <button
+          (click)="closeDeleteModal()"
+          class="flex-1 py-3 text-sm font-semibold text-gray-500 hover:bg-gray-50 transition-colors"
+        >
+          Cancel
+        </button>
+        <div class="w-px bg-gray-100"></div>
+        <button
+          (click)="confirmDelete()"
+          class="flex-1 py-3 text-sm font-semibold text-red-500 hover:bg-red-50 transition-colors"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<div class="max-w-[1350px] mx-auto py-4 lg:py-8 px-2 md:px-4">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <!-- Main Feed -->
+    <main class="col-span-4xl lg:col-span-8 w-full">
+      <!-- Create Post -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-4 p-4">
+        <div class="flex items-center gap-3 mb-3">
+          <img
+            [src]="currentUser.photo"
+            alt="user photo"
+            class="w-10 h-10 rounded-full object-cover border border-gray-200"
+          />
+          <div>
+            <p class="font-semibold text-gray-800 text-sm">{{ currentUser.name }}</p>
+            <div class="relative">
+              <button
+                (click)="togglePrivacyMenu()"
+                class="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium px-2 py-1 rounded-md mt-1 transition-colors"
+              >
+                <fa-icon [icon]="faGlobe" class="text-xs" />
+                {{ selectedPrivacy }}
+                <fa-icon [icon]="faChevronDown" class="text-xs" />
+              </button>
+              @if (showPrivacyMenu) {
+                <div
+                  class="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-100 z-10 min-w-28 overflow-hidden"
+                >
+                  @for (option of privacyOptions; track option) {
+                    <button
+                      (click)="selectPrivacy(option)"
+                      class="block w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition-colors"
+                      [class.font-semibold]="option === selectedPrivacy"
+                    >
+                      {{ option }}
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <textarea
+          [(ngModel)]="postBody"
+          (ngModelChange)="postBodyError = false"
+          [placeholder]="'What\'s on your mind, ' + firstName + '?'"
+          class="w-full min-h-24 border-none outline-none resize-y text-gray-700 text-sm bg-transparent font-inherit leading-relaxed placeholder-gray-400"
+          [class.text-red-400]="postBodyError"
+        ></textarea>
+        @if (postBodyError) {
+          <p class="text-xs text-red-400 mb-1">Please write something before posting.</p>
+        }
+
+        @if (selectedImage) {
+          <div class="relative mb-2 inline-block">
+            <img
+              [src]="selectedImage"
+              alt="preview"
+              class="max-h-48 rounded-lg object-cover border border-gray-200"
+            />
+            <button
+              (click)="removeImage()"
+              class="absolute top-1 right-1 bg-gray-800 bg-opacity-60 hover:bg-opacity-80 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs transition-colors"
+            >
+              <fa-icon [icon]="faXmark" />
+            </button>
+          </div>
+        }
+
+        <input
+          #fileInput
+          type="file"
+          accept="image/*,video/*"
+          class="hidden"
+          (change)="onFileSelected($event)"
+        />
+
+        @if (showEmojiPicker) {
+          <div class="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-lg border border-gray-100 mb-2">
+            @for (emoji of emojis; track emoji) {
+              <button
+                (click)="addEmoji(emoji)"
+                class="text-xl hover:bg-gray-200 rounded p-1 transition-colors"
+              >
+                {{ emoji }}
+              </button>
+            }
+          </div>
+        }
+
+        <div class="border-t border-gray-100 mx-[-16px] mb-2"></div>
+
+        <div class="flex items-center justify-between">
+          <div class="flex gap-1">
+            <button
+              (click)="fileInput.click()"
+              class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 text-sm text-gray-500 transition-colors"
+            >
+              <fa-icon [icon]="faImage" class="text-green-500" />
+              Photo/video
+            </button>
+            <button
+              (click)="toggleEmojiPicker()"
+              class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
+              [class]="
+                showEmojiPicker ? 'bg-yellow-50 text-yellow-500' : 'hover:bg-gray-50 text-gray-500'
+              "
+            >
+              <fa-icon [icon]="faFaceSmile" class="text-yellow-400" />
+              Feeling/activity
+            </button>
+          </div>
+          <button
+            (click)="submitPost()"
+            class="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+          >
+            Post
+            <fa-icon [icon]="faPaperPlane" />
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading Skeleton -->
+      @if (isLoading) {
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-4 p-4 animate-pulse">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-gray-200"></div>
+            <div class="flex flex-col gap-2 flex-1">
+              <div class="h-3 bg-gray-200 rounded w-32"></div>
+              <div class="h-2 bg-gray-100 rounded w-20"></div>
+            </div>
+          </div>
+          <div class="flex flex-col gap-2 mb-4">
+            <div class="h-3 bg-gray-200 rounded w-full"></div>
+            <div class="h-3 bg-gray-200 rounded w-4/5"></div>
+            <div class="h-3 bg-gray-200 rounded w-3/5"></div>
+          </div>
+          <div class="h-40 bg-gray-100 rounded-lg mb-4"></div>
+          <div class="flex items-center justify-center gap-2 pt-2 border-t border-gray-100">
+            <div
+              class="w-4 h-4 rounded-full bg-blue-200 animate-bounce"
+              style="animation-delay: 0ms"
+            ></div>
+            <div
+              class="w-4 h-4 rounded-full bg-blue-300 animate-bounce"
+              style="animation-delay: 150ms"
+            ></div>
+            <div
+              class="w-4 h-4 rounded-full bg-blue-400 animate-bounce"
+              style="animation-delay: 300ms"
+            ></div>
+            <span class="text-sm text-gray-400 font-medium ml-1">Reloading posts...</span>
+          </div>
+        </div>
+      }
+
+      <!-- Posts Loop -->
+      @for (post of posts; track post._id) {
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-4 overflow-hidden">
+          <!-- Post Header -->
+          <div class="flex items-center justify-between px-4 pt-4 pb-2">
+            <div class="flex items-center gap-3">
+              <img
+                [src]="post.user.photo"
+                alt="user photo"
+                class="w-10 h-10 rounded-full object-cover border border-gray-200"
+              />
+              <div>
+                <p class="font-semibold text-gray-800 text-sm">{{ post.user.name }}</p>
+                <div class="flex items-center gap-1 text-xs text-gray-400">
+                  @if (post.user.username) {
+                    <span>@{{ post.user.username }}</span>
+                    <span>·</span>
+                  }
+                  <span>{{ post.createdAt | date: 'mediumDate' }}</span>
+                  <span>·</span>
+                  <span class="capitalize">{{ post.privacy }}</span>
+                  @if (post.bookmarked == true) {
+                    <div class="px-4 pt-1">
+                      <span
+                        class="inline-flex items-center gap-1 text-[10px] font-bold text-blue-500 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full"
+                      >
+                        <fa-icon [icon]="faBookmark" class="text-[9px]" />
+                        Saved
+                      </span>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+            <div class="relative">
+              <button
+                (click)="togglePostMenu(post._id)"
+                class="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100"
+              >
+                <fa-icon [icon]="faEllipsis" />
+              </button>
+              @if (openMenuPostId === post._id) {
+                <div
+                  class="absolute right-0 top-8 z-20 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden min-w-36"
+                  (click)="$event.stopPropagation()"
+                >
+                  <!-- 1. زرار Save في الـ dropdown - استبدل الزرار الموجود -->
+                  <button
+                    (click)="toggleBookmark(post._id)"
+                    class="flex items-center gap-2 w-full px-4 py-2.5 text-sm transition-colors"
+                    [class]="
+                      bookmarkedPostIds.has(post._id) || post.bookmarked
+                        ? 'text-blue-500 bg-blue-50'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    "
+                  >
+                    @if (loadingBookmarkPostId === post._id) {
+                      <svg
+                        class="w-4 h-4 animate-spin text-blue-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          class="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          stroke-width="4"
+                        />
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                      </svg>
+                    } @else {
+                      <fa-icon
+                        [icon]="faBookmark"
+                        class="w-4"
+                        [class]="
+                          bookmarkedPostIds.has(post._id) || post.bookmarked
+                            ? 'text-blue-500'
+                            : 'text-blue-400'
+                        "
+                      />
+                    }
+                    {{ bookmarkedPostIds.has(post._id) || post.bookmarked ? 'Unsave' : 'Save' }}
+                  </button>
+                  @if (isMyPost(post)) {
+                    <button
+                      class="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      (click)="startEditPost(post)"
+                    >
+                      <fa-icon [icon]="faPenToSquare" class="text-green-400 w-4" />
+                      Edit
+                    </button>
+                    <button
+                      class="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                      (click)="openDeleteModal('post', post._id)"
+                    >
+                      <fa-icon [icon]="faTrash" class="w-4" />
+                      Delete
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+
+          @if (editingPostId === post._id) {
+            <!-- Edit Mode -->
+            <div class="px-4 py-2">
+              <textarea
+                [(ngModel)]="editPostBody"
+                rows="3"
+                class="w-full border border-blue-200 rounded-xl outline-none resize-none text-gray-700 text-sm p-3 leading-relaxed bg-blue-50/30 focus:border-blue-400 focus:bg-white transition-all"
+              ></textarea>
+              <div class="flex justify-end gap-2 mt-2">
+                <button
+                  (click)="cancelEditPost()"
+                  class="px-4 py-1.5 text-xs font-semibold text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  (click)="submitEditPost(post)"
+                  [disabled]="isUpdatingPost || !editPostBody.trim()"
+                  class="px-4 py-1.5 text-xs font-semibold text-white rounded-lg transition-colors"
+                  [class]="
+                    isUpdatingPost || !editPostBody.trim()
+                      ? 'bg-blue-300 cursor-not-allowed'
+                      : 'bg-blue-500 hover:bg-blue-600'
+                  "
+                >
+                  {{ isUpdatingPost ? 'Saving...' : 'Save' }}
+                </button>
+              </div>
+            </div>
+          } @else {
+            <!-- View Mode -->
+            @if (post.body?.trim()) {
+              <p class="px-4 py-2 text-gray-700 text-sm">{{ post.body }}</p>
+            }
+          }
+
+          <!-- Post Image -->
+          @if (post.image && !post.isShare) {
+            <img
+              [src]="post.image"
+              (click)="openImagePreview(post.image)"
+              class="w-full object-cover max-h-96 cursor-pointer hover:brightness-95 transition-all"
+            />
+          }
+
+          <!-- Shared Post -->
+          @if (post.isShare && post.sharedPost) {
+            <div class="mx-4 mb-2 border border-gray-200 rounded-xl overflow-hidden bg-gray-50">
+              <div class="flex items-center gap-2 px-3 pt-3 pb-2">
+                <img
+                  [src]="post.sharedPost.user.photo"
+                  alt="user photo"
+                  class="w-8 h-8 rounded-full object-cover border border-gray-200"
+                />
+                <div>
+                  <p class="font-semibold text-gray-800 text-sm">{{ post.sharedPost.user.name }}</p>
+                  <div class="flex items-center gap-1 text-xs text-gray-400">
+                    @if (post.sharedPost.user.username) {
+                      <span>@{{ post.sharedPost.user.username }}</span>
+                      <span>·</span>
+                    }
+                    <span>{{ post.sharedPost.createdAt | date: 'mediumDate' }}</span>
+                    <span>·</span>
+                    <span class="capitalize">{{ post.sharedPost.privacy }}</span>
+                  </div>
+                </div>
+              </div>
+              @if (post.sharedPost.body?.trim()) {
+                <p class="px-3 pb-2 text-gray-700 text-sm">{{ post.sharedPost.body }}</p>
+              }
+              @if (post.sharedPost.image) {
+                <img
+                  [src]="post.sharedPost.image"
+                  (click)="openImagePreview(post.sharedPost.image)"
+                  class="w-full object-cover max-h-72 cursor-pointer hover:brightness-95 transition-all"
+                />
+              }
+            </div>
+          }
+
+          <!-- Stats -->
+          <div class="flex items-center justify-between px-4 py-2 text-xs text-gray-400">
+            <div class="flex items-center gap-1">
+              <fa-icon [icon]="faThumbsUp" class="text-gray-500" />
+              <span>{{ post.likesCount }} likes</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span>{{ post.sharesCount }} shares</span>
+              <span>{{ post.commentsCount }} comments</span>
+              <a
+                [routerLink]="['/post-details', post._id]"
+                class="text-blue-500 font-medium hover:underline text-xs"
+                >View details</a
+              >
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex items-center border-t border-gray-100">
+            <button
+              (click)="ToggleLike(post._id)"
+              [disabled]="loadingLikePostId === post._id"
+              class="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm transition-colors"
+              [class]="
+                likedPostIds.has(post._id)
+                  ? 'text-blue-600 bg-blue-50'
+                  : 'text-gray-500 hover:bg-blue-50 hover:text-blue-600'
+              "
+            >
+              @if (loadingLikePostId === post._id) {
+                <!-- Loading spinner -->
+                <svg class="w-4 h-4 animate-spin text-blue-400" fill="none" viewBox="0 0 24 24">
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  />
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                </svg>
+              } @else {
+                <fa-icon
+                  [icon]="faThumbsUp"
+                  [class]="likedPostIds.has(post._id) ? 'text-blue-600' : ''"
+                />
+              }
+              {{ likedPostIds.has(post._id) ? 'Liked' : 'Like' }}
+            </button>
+            <button
+              (click)="toggleComments(post._id)"
+              class="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors border-x border-gray-100"
+            >
+              <fa-icon [icon]="faComment" />
+              Comment
+            </button>
+            <button
+              (click)="openShareModal(post)"
+              class="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors"
+            >
+              <fa-icon [icon]="faShare" />
+              Share
+            </button>
+          </div>
+
+          <!-- Comments Section -->
+          @if (openCommentsPostId === post._id) {
+            <div class="border-t border-gray-100">
+              <!-- Comments List -->
+              <div class="overflow-y-auto px-4 py-3 flex flex-col gap-4" style="max-height: 400px">
+                @if (commentsLoading || commentUploading) {
+                  @for (i of [1, 2, 3]; track i) {
+                    <div class="flex items-start gap-2 animate-pulse">
+                      <div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0"></div>
+                      <div class="flex-1">
+                        <div class="bg-gray-100 rounded-2xl px-3 py-2">
+                          <div class="h-2.5 bg-gray-200 rounded w-24 mb-2"></div>
+                          <div class="h-2 bg-gray-200 rounded w-full mb-1"></div>
+                          <div class="h-2 bg-gray-200 rounded w-3/4"></div>
+                        </div>
+                        <div class="flex gap-3 mt-1 px-1">
+                          <div class="h-2 bg-gray-100 rounded w-16"></div>
+                          <div class="h-2 bg-gray-100 rounded w-10"></div>
+                          <div class="h-2 bg-gray-100 rounded w-10"></div>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                } @else if (postComments.length === 0) {
+                  <p class="text-sm text-gray-400 text-center py-4">
+                    No comments yet. Be the first!
+                  </p>
+                } @else {
+                  @for (comment of postComments; track comment._id) {
+                    <div class="flex items-start gap-2 mb-4">
+                      <img
+                        [src]="comment.commentCreator.photo"
+                        class="w-8 h-8 rounded-full object-cover"
+                      />
+
+                      <div class="flex-1">
+                        @if (editingCommentId === comment._id) {
+                          <!-- Edit Mode -->
+                          <div class="bg-white border border-blue-200 rounded-2xl p-2 shadow-sm">
+                            <textarea
+                              [(ngModel)]="editContent"
+                              class="w-full text-sm p-2 outline-none resize-none bg-transparent"
+                              rows="2"
+                            ></textarea>
+
+                            <!-- FIX: كانت commentImage، الصح هي editImagePreview -->
+                            @if (editImagePreview) {
+                              <div class="relative inline-block mt-2">
+                                <img
+                                  [src]="editImagePreview"
+                                  (click)="openImagePreview(editImagePreview)"
+                                  class="max-h-32 rounded-lg border cursor-pointer hover:brightness-95 transition-all"
+                                />
+                                <button
+                                  (click)="
+                                    editImagePreview = null;
+                                    isImageDeleted = true;
+                                    selectedEditFile = null
+                                  "
+                                  class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-md"
+                                >
+                                  <fa-icon [icon]="faXmark" />
+                                </button>
+                              </div>
+                            }
+
+                            <div
+                              class="flex items-center justify-between mt-2 pt-2 border-t border-gray-100"
+                            >
+                              <label
+                                class="cursor-pointer text-gray-400 hover:text-blue-500 transition-colors"
+                              >
+                                <fa-icon [icon]="faImage" />
+                                <input
+                                  type="file"
+                                  class="hidden"
+                                  (change)="onEditFileSelected($event)"
+                                  accept="image/*"
+                                />
+                              </label>
+                              <div class="flex gap-2">
+                                <button
+                                  (click)="cancelEdit()"
+                                  class="px-3 py-1 text-xs font-semibold text-gray-500 hover:bg-gray-100 rounded-lg"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  (click)="submitUpdate(comment)"
+                                  [disabled]="isUpdating"
+                                  class="px-3 py-1 text-xs font-semibold bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-300"
+                                >
+                                  {{ isUpdating ? 'Saving...' : 'Save' }}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        } @else {
+                          <!-- View Mode -->
+                          <div class="bg-gray-100 rounded-2xl px-3 py-2 inline-block max-w-full">
+                            <p class="text-xs font-semibold text-gray-800">
+                              {{ comment.commentCreator.name }}
+                            </p>
+                            <p class="text-sm text-gray-700 mt-1">{{ comment.content }}</p>
+                            <!-- FIX: أضفنا click وcursor-pointer -->
+                            @if (comment.image) {
+                              <img
+                                [src]="comment.image"
+                                (click)="openImagePreview(comment.image)"
+                                class="mt-2 rounded-xl max-h-40 object-cover cursor-pointer hover:brightness-95 transition-all"
+                              />
+                            }
+                          </div>
+
+                          <div class="flex items-center gap-3 mt-1 px-2 relative">
+                            <span class="text-xs text-gray-400">{{
+                              comment.createdAt | date: 'MMM d, h:mm a'
+                            }}</span>
+                            <button
+                              (click)="ToggleLikeComment(comment._id, post._id)"
+                              class="text-xs font-semibold transition-colors"
+                              [class]="
+                                isCommentLiked(comment)
+                                  ? 'text-blue-600'
+                                  : 'text-gray-500 hover:text-blue-500'
+                              "
+                            >
+                              {{ isCommentLiked(comment) ? 'Liked' : 'Like' }}
+                            </button>
+                            <button
+                              (click)="toggleReply(comment._id)"
+                              class="text-xs font-semibold transition-colors"
+                              [class]="
+                                openReplyCommentId === comment._id
+                                  ? 'text-blue-500'
+                                  : 'text-gray-500 hover:text-blue-500'
+                              "
+                            >
+                              {{ openReplyCommentId === comment._id ? 'Hide Reply' : 'Reply' }}
+                            </button>
+                            <!-- Replies Section -->
+                            @if (openReplyCommentId === comment._id) {
+                              <div
+                                class="mt-3 ml-2 pl-3 border-l-2 border-blue-100 flex flex-col gap-3"
+                              >
+                                @if (repliesLoadingId === comment._id) {
+                                  @for (i of [1, 2]; track i) {
+                                    <div class="flex items-start gap-2 animate-pulse">
+                                      <div
+                                        class="w-6 h-6 rounded-full bg-gray-200 flex-shrink-0"
+                                      ></div>
+                                      <div class="flex-1">
+                                        <div class="bg-gray-100 rounded-2xl px-3 py-2">
+                                          <div class="h-2 bg-gray-200 rounded w-20 mb-2"></div>
+                                          <div class="h-2 bg-gray-200 rounded w-full"></div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  }
+                                } @else {
+                                  @if ((repliesMap[comment._id] ?? []).length > 0) {
+                                    @for (reply of repliesMap[comment._id]; track reply._id) {
+                                      <div class="flex items-start gap-2">
+                                        <img
+                                          [src]="reply.commentCreator?.photo || reply.user?.photo"
+                                          class="w-6 h-6 rounded-full object-cover flex-shrink-0 mt-1"
+                                        />
+                                        <div>
+                                          <div
+                                            class="bg-gray-100 rounded-2xl px-3 py-2 inline-block max-w-full"
+                                          >
+                                            <p class="text-xs font-semibold text-gray-800">
+                                              {{ reply.commentCreator?.name || reply.user?.name }}
+                                            </p>
+                                            <p class="text-xs text-gray-700 mt-0.5">
+                                              {{ reply.content }}
+                                            </p>
+                                          </div>
+                                          <p class="text-[10px] text-gray-400 mt-1 px-1">
+                                            {{ reply.createdAt | date: 'MMM d, h:mm a' }}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    }
+                                  } @else {
+                                    <p class="text-xs text-gray-400">No replies yet.</p>
+                                  }
+                                }
+
+                                <!-- Reply Input -->
+                                <div class="flex items-end gap-2">
+                                  <img
+                                    [src]="currentUser.photo"
+                                    class="w-6 h-6 rounded-full object-cover flex-shrink-0 mb-1"
+                                  />
+                                  <div
+                                    class="flex-1 border border-gray-200 rounded-2xl bg-white overflow-hidden focus-within:border-blue-400 transition-all"
+                                  >
+                                    <textarea
+                                      [(ngModel)]="replyTextMap[comment._id]"
+                                      placeholder="Write a reply..."
+                                      rows="1"
+                                      class="w-full outline-none resize-none text-xs text-gray-700 placeholder-gray-400 leading-relaxed px-3 pt-2 pb-1 bg-transparent"
+                                    ></textarea>
+                                    <div class="flex justify-end px-2 pb-2">
+                                      <button
+                                        (click)="submitReply(comment._id)"
+                                        [disabled]="
+                                          !replyTextMap[comment._id]?.trim() ||
+                                          replySubmittingId === comment._id
+                                        "
+                                        class="w-7 h-7 text-white rounded-full flex items-center justify-center transition-all"
+                                        [class]="
+                                          replyTextMap[comment._id]?.trim() &&
+                                          replySubmittingId !== comment._id
+                                            ? 'bg-blue-500 hover:bg-blue-600 active:scale-95'
+                                            : 'bg-blue-300 cursor-not-allowed'
+                                        "
+                                      >
+                                        @if (replySubmittingId === comment._id) {
+                                          <svg
+                                            class="w-3 h-3 animate-spin"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                          >
+                                            <circle
+                                              class="opacity-25"
+                                              cx="12"
+                                              cy="12"
+                                              r="10"
+                                              stroke="currentColor"
+                                              stroke-width="4"
+                                            />
+                                            <path
+                                              class="opacity-75"
+                                              fill="currentColor"
+                                              d="M4 12a8 8 0 018-8v8z"
+                                            />
+                                          </svg>
+                                        } @else {
+                                          <fa-icon [icon]="faPaperPlane" class="text-[10px]" />
+                                        }
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            }
+                            @if (comment.commentCreator._id === currentUser._id) {
+                              <div class="ml-auto relative">
+                                <button
+                                  (click)="toggleCommentMenu($event, comment._id)"
+                                  class="text-gray-300 hover:text-gray-500 transition-colors p-1 rounded-full hover:bg-gray-100"
+                                >
+                                  <fa-icon [icon]="faEllipsis" class="text-xs text-dark" />
+                                </button>
+
+                                @if (openCommentMenuId === comment._id) {
+                                  <div
+                                    class="absolute right-0 bottom-full mb-2 w-32 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-[100] animate-fade-in"
+                                    (click)="$event.stopPropagation()"
+                                  >
+                                    <button
+                                      (click)="startUpdateComment(comment)"
+                                      class="flex items-center gap-3 w-full px-3 py-2 text-[11px] font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                                    >
+                                      <fa-icon [icon]="faPenToSquare" class="text-blue-500 w-3" />
+                                      Update
+                                    </button>
+                                    <button
+                                      (click)="openDeleteModal('comment', comment)"
+                                      class="flex items-center gap-3 w-full px-3 py-2 text-[11px] font-semibold text-red-500 hover:bg-red-50 transition-colors"
+                                    >
+                                      <fa-icon [icon]="faTrash" class="w-3" />
+                                      Delete
+                                    </button>
+                                  </div>
+                                }
+                              </div>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                }
+              </div>
+
+              <!-- Add Comment -->
+              <div class="px-4 pb-4 pt-3 border-t border-gray-100">
+                <div class="flex items-end gap-2">
+                  <img
+                    [src]="currentUser.photo"
+                    alt="user"
+                    class="w-8 h-8 rounded-full object-cover border border-gray-200 flex-shrink-0 mb-1"
+                  />
+                  <div
+                    class="flex-1 border border-gray-200 rounded-2xl bg-white shadow-sm overflow-hidden focus-within:border-blue-400 focus-within:shadow-md transition-all"
+                  >
+                    <textarea
+                      [(ngModel)]="newComment"
+                      [placeholder]="'Comment as ' + firstName + '...'"
+                      rows="1"
+                      class="w-full outline-none resize-none text-sm text-gray-700 placeholder-gray-400 leading-relaxed px-4 pt-3 pb-1 bg-transparent"
+                    ></textarea>
+
+                    <!-- FIX: أضفنا click وcursor-pointer على صورة الـ preview -->
+                    @if (commentImage) {
+                      <div class="relative inline-block mx-4 mb-2">
+                        <img
+                          [src]="commentImage"
+                          (click)="openImagePreview(commentImage!)"
+                          class="max-h-24 rounded-xl object-cover border border-gray-200 cursor-pointer hover:brightness-95 transition-all"
+                        />
+                        <button
+                          (click)="removeCommentImage()"
+                          class="absolute top-1 right-1 bg-gray-800 bg-opacity-60 hover:bg-opacity-80 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                        >
+                          <fa-icon [icon]="faXmark" />
+                        </button>
+                      </div>
+                    }
+
+                    @if (showCommentEmojiPicker) {
+                      <div class="flex flex-wrap gap-1 px-3 pb-2">
+                        @for (emoji of commentEmojis; track emoji) {
+                          <button
+                            (click)="addCommentEmoji(emoji)"
+                            class="text-lg hover:bg-gray-100 rounded p-0.5 transition-colors"
+                          >
+                            {{ emoji }}
+                          </button>
+                        }
+                      </div>
+                    }
+
+                    <div class="flex items-center justify-between px-3 pb-2">
+                      <div class="flex gap-1">
+                        <input
+                          #commentFileInput
+                          type="file"
+                          accept="image/*"
+                          class="hidden"
+                          (change)="onCommentFileSelected($event)"
+                        />
+                        <button
+                          (click)="commentFileInput.click()"
+                          class="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-green-500 hover:bg-green-50 transition-colors"
+                        >
+                          <fa-icon [icon]="faImage" />
+                        </button>
+                        <button
+                          (click)="toggleCommentEmojiPicker()"
+                          class="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
+                          [class]="
+                            showCommentEmojiPicker
+                              ? 'text-yellow-400 bg-yellow-50'
+                              : 'text-gray-400 hover:text-yellow-400 hover:bg-yellow-50'
+                          "
+                        >
+                          <fa-icon [icon]="faFaceSmile" />
+                        </button>
+                      </div>
+                      <button
+                        (click)="submitComments()"
+                        [disabled]="!newComment.trim() && !commentFile"
+                        class="w-8 h-8 text-white rounded-full flex items-center justify-center transition-all shadow-sm"
+                        [class]="
+                          newComment.trim() || commentFile
+                            ? 'bg-blue-500 hover:bg-blue-600 active:scale-95'
+                            : 'bg-blue-300 cursor-not-allowed'
+                        "
+                      >
+                        <fa-icon [icon]="faPaperPlane" class="text-xs" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </main>
+
+    <aside class="hidden lg:block lg:col-span-4 sticky top-24">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sticky top-24">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-gray-800 flex items-center gap-2 text-sm">
+            <fa-icon [icon]="faChevronDown" class="text-blue-500 rotate-180 text-xs" />
+            Suggested Friends
+          </h3>
+          <span class="bg-gray-100 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded-full">
+            {{ suggestions.length }}
+          </span>
+        </div>
+
+        <div class="relative mb-5">
+          <fa-icon
+            [icon]="faGlobe"
+            class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-xs"
+          />
+          <input
+            type="text"
+            placeholder="Search friends..."
+            class="w-full bg-gray-50 border border-gray-100 rounded-xl py-2 pl-9 pr-4 text-xs outline-none focus:border-blue-200 transition-all placeholder:text-gray-400"
+          />
+        </div>
+
+        <div class="flex flex-col gap-4">
+          @for (user of suggestions; track user._id) {
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2 overflow-hidden">
+                <img
+                  [src]="user.photo"
+                  class="w-9 h-9 rounded-full object-cover border border-gray-100 flex-shrink-0"
+                />
+                <div class="overflow-hidden">
+                  <p class="text-[11px] font-bold text-gray-800 truncate">{{ user.name }}</p>
+                  <p class="text-[9px] text-gray-400 truncate">
+                    {{ user.followersCount }} followers
+                    @if (user.mutualFollowersCount > 0) {
+                      · {{ user.mutualFollowersCount }} mutual
+                    }
+                  </p>
+                </div>
+              </div>
+              <button
+                class="flex items-center gap-1 border border-blue-100 text-blue-500 px-2 py-1.5 rounded-lg text-[10px] font-bold hover:bg-blue-50 transition-all whitespace-nowrap"
+                (click)="ToggleFollow(user._id)"
+              >
+                <fa-icon [icon]="faChevronDown" class="rotate-[-90deg] text-[8px]" />
+                Follow
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>

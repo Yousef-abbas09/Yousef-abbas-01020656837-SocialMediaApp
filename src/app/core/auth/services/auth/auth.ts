@@ -10,10 +10,12 @@ export class Auth {
   private readonly httpClient = inject(HttpClient);
 
   sendRegisterData(data: object): Observable<any> {
-    return this.httpClient.post(environment.base_url+'/users/signup', data);
+    return this.httpClient.post(environment.base_url + '/users/signup', data);
   }
 
   sendLoginData(data: object): Observable<any> {
-    return this.httpClient.post(environment.base_url+'/users/signin', data);
+    return this.httpClient.post(environment.base_url + '/users/signin', data);
   }
+
+
 }

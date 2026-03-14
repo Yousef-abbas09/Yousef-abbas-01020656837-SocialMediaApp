@@ -1,1 +1,127 @@
-<p>notifications works!</p>
+<div
+  class="max-w-4xl mx-auto p-4 md:p-6 bg-white rounded-2xl border border-gray-100 shadow-sm mt-8"
+>
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div>
+      <h2 class="text-2xl font-extrabold text-gray-900 tracking-tight">Notifications</h2>
+      <p class="text-gray-500 text-sm mt-1 font-medium">
+        Manage your daily activities and interactions.
+      </p>
+    </div>
+    <button
+      (click)="MarkallAsRead()"
+      class="w-fit flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-95 shadow-sm"
+    >
+      <span class="text-green-600 text-xs">✔</span>
+      Mark all as read
+    </button>
+  </div>
+
+  <div class="flex gap-2 mb-8 p-1 bg-gray-50 w-fit rounded-2xl">
+    <button
+      class="px-6 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold shadow-md shadow-blue-100"
+    >
+      All
+    </button>
+  </div>
+
+  <div class="grid gap-3">
+    @for (noti of notificationsList(); track noti._id) {
+      <div
+        class="relative flex items-start gap-4 p-4 rounded-2xl border transition-all duration-300 group"
+        [class.bg-blue-50]="!noti.isRead"
+        [class.border-blue-100]="!noti.isRead"
+        [class.bg-white]="noti.isRead"
+        [class.border-gray-50]="noti.isRead"
+      >
+        <div class="relative flex-shrink-0">
+          <img
+            [src]="noti.actor.photo"
+            class="w-14 h-14 rounded-full object-cover border-2 border-white shadow-sm transition-transform group-hover:scale-105"
+            alt="actor"
+          />
+          @if (!noti.isRead) {
+            <span
+              class="absolute top-0 right-0 w-3.5 h-3.5 bg-blue-600 border-2 border-white rounded-full"
+            ></span>
+          }
+        </div>
+
+        <div class="flex-1 min-w-0">
+          <div class="flex justify-between items-start mb-1">
+            <h3 class="text-[15px] font-bold text-gray-900 truncate">
+              {{ noti.actor.name }}
+              <span class="text-gray-500 font-medium ml-1">
+                {{ getActionMessage(noti.type) }}
+              </span>
+            </h3>
+            <span class="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-2">
+              {{ noti.createdAt | date: 'shortTime' }}
+            </span>
+          </div>
+
+          @if (noti.entity?.body) {
+            <p
+              class="text-gray-600 text-sm leading-relaxed line-clamp-1 mb-3 bg-white/50 p-2 rounded-lg italic border-l-2 border-blue-200"
+            >
+              "{{ noti.entity.body }}"
+            </p>
+          } @else if (noti.type === 'follow_user') {
+            <p class="text-blue-600 text-xs font-bold mt-1 cursor-pointer hover:underline">
+              View profile
+            </p>
+          }
+
+          <div class="flex items-center gap-4 mt-2">
+            <div
+              class="flex items-center justify-center w-8 h-8 rounded-full bg-white shadow-sm border border-gray-100"
+            >
+              @switch (noti.type) {
+                @case ('like_post') {
+                  <span>❤️</span>
+                }
+                @case ('comment_post') {
+                  <span>💬</span>
+                }
+                @case ('share_post') {
+                  <span>🔄</span>
+                }
+                @case ('follow_user') {
+                  <span>👤</span>
+                }
+                @default {
+                  <span>🔔</span>
+                }
+              }
+            </div>
+
+            <button (click)="MarkNotiAsRead(noti._id)" class="flex items-center gap-1.5 group/btn">
+              <div
+                class="w-5 h-5 rounded-md border flex items-center justify-center transition-colors"
+                [class.bg-green-500]="noti.isRead"
+                [class.border-green-500]="noti.isRead"
+                [class.bg-white]="!noti.isRead"
+                [class.border-gray-300]="!noti.isRead"
+              >
+                <span class="text-white text-[10px] font-bold" [class.hidden]="!noti.isRead"
+                  >✓</span
+                >
+              </div>
+              <span
+                class="text-xs font-bold transition-colors"
+                [class.text-green-600]="noti.isRead"
+                [class.text-gray-400]="!noti.isRead"
+              >
+                {{ noti.isRead ? 'Read' : 'Mark as read' }}
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    } @empty {
+      <div class="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+        <p class="text-gray-500 font-bold italic">No notifications found.</p>
+      </div>
+    }
+  </div>
+</div>

@@ -9,6 +9,7 @@ import {
   faGear,
   faRightFromBracket,
 } from '@fortawesome/free-solid-svg-icons';
+import { Auth } from '../../core/auth/services/auth/auth';
 
 @Component({
   selector: 'app-navbar',
@@ -18,6 +19,7 @@ import {
 })
 export class Navbar {
   private readonly router = inject(Router);
+  private readonly auth = inject(Auth);
 
   faHouse = faHouse;
   faBell = faBell;
@@ -25,13 +27,11 @@ export class Navbar {
   faUser = faUser;
   faGear = faGear;
   faRightFromBracket = faRightFromBracket;
-
   isDropdownOpen: boolean = false;
 
   // TODO: replace with real user data from your auth/user service
-  userName: string = 'Yousef Abbas';
-  userPhoto: string = 'https://i.pravatar.cc/150?img=3';
-
+userName: string = JSON.parse(localStorage.getItem('userdata') ?? 'null')?.name;
+userPhoto: string = JSON.parse(localStorage.getItem('userdata') ?? 'null')?.photo;
   toggleDropdown(): void {
     this.isDropdownOpen = !this.isDropdownOpen;
   }
@@ -47,6 +47,7 @@ export class Navbar {
 
   logout(): void {
     localStorage.removeItem('token');
+    localStorage.removeItem('userdata');
     this.isDropdownOpen = false;
     this.router.navigate(['/login']);
   }

@@ -43,6 +43,7 @@ export class Login implements OnInit {
           this.isLoading = false;
           if (res.success) {
             localStorage.setItem('token', res.data.token);
+            localStorage.setItem('userdata', JSON.stringify(res.data.user));
             this.router.navigate(['/feed']);
           }
         },
